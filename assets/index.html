@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Event Source</title>
+	<style>
+      body {
+          background: #ededed;
+      }
+	</style>
+</head>
+<body>
+<pre id="coverage"></pre>
+<script>
+	(function() {
+		const coverage  = document.getElementById('coverage');
+		const evtSource = new EventSource('/api/sse');
+
+		const updateCoverage = ({data}) => {
+			coverage.innerHTML = data;
+		};
+
+		evtSource.onerror = console.error;
+		evtSource.onmessage = console.log;
+
+		evtSource.addEventListener('EVENT_COVERAGE', updateCoverage);
+		evtSource.addEventListener('error', console.error);
+	})();
+
+</script>
+</body>
+</html>

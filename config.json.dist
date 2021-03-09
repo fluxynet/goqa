@@ -1,0 +1,10 @@
+{
+  "server_host": "127.0.0.1:80",
+  "email_host": "",
+  "email_usr": "",
+  "email_pass": "",
+  "email_from": "",
+  "email_subscribers": "",
+  "github_signature": "",
+  "github_token": ""
+}
