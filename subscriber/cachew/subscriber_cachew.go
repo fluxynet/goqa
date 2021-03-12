@@ -25,7 +25,7 @@ func (c *Cache) Notify(event goqa.Event) error {
 		return subscriber.ErrUnsupportedEvent
 	}
 
-	var err = c.cache.Reinit(e.Coverage...)
+	var err = c.cache.Reset(e.Coverage...)
 	return err
 }
 

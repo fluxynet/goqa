@@ -45,7 +45,7 @@ type Repo interface {
 // Cache mechanism to store coverage data in memory
 type Cache interface {
 	// Reinit purges existing coverage info and stores new info
-	Reinit(covs ...Coverage) error
+	Reset(covs ...Coverage) error
 
 	// Get coverage data for a package
 	Get(pkg string) (*Coverage, bool)

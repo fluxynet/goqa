@@ -46,10 +46,12 @@ func CreateGithubEvent(p *Payload) *goqa.GithubEvent {
 			Time: p.Data[i].Time,
 		}
 
-		var perc = strings.TrimPrefix(
-			strings.TrimSuffix(p.Data[i].Output, "% of statements\\n"),
-			"coverage: ",
-		)
+		var perc string
+		if x := strings.Index(p.Data[i].Output, "%"); x == -1 || x < 10 { // 10 is the length of "coverage: "
+			continue
+		} else {
+			perc = p.Data[i].Output[10:x]
+		}
 
 		if v, err := strconv.ParseFloat(perc, 64); err == nil {
 			c.Percentage = int(v) // really, we do not need that level of precision

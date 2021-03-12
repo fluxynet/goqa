@@ -6,21 +6,17 @@ import (
 	"github.com/fluxynet/goqa"
 )
 
-func init() {
-	var _ goqa.Cache = New()
-}
-
 type Memory struct {
 	items map[string]goqa.Coverage
-	mut   sync.RWMutex
+	mut   sync.Mutex
 }
 
 func New() *Memory {
 	return &Memory{items: make(map[string]goqa.Coverage)}
 }
 
-func (m *Memory) Reinit(covs ...goqa.Coverage) error {
-	var d = make(map[string]goqa.Coverage)
+func (m *Memory) Reset(covs ...goqa.Coverage) error {
+	var d = make(map[string]goqa.Coverage, len(covs))
 	for i := range covs {
 		d[covs[i].Pkg] = covs[i]
 	}
@@ -47,8 +43,8 @@ func (m *Memory) Keys() ([]string, error) {
 		return nil, nil
 	}
 
-	m.mut.RLock()
-	m.mut.Unlock()
+	defer m.mut.Unlock()
+	m.mut.Lock()
 
 	var (
 		keys = make([]string, len(m.items))
@@ -64,6 +60,9 @@ func (m *Memory) Keys() ([]string, error) {
 }
 
 func (m *Memory) Close() error {
+	defer m.mut.Unlock()
+	m.mut.Lock()
+
 	m.items = nil
 	return nil
 }

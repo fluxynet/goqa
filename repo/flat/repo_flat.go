@@ -6,16 +6,19 @@ import (
 	"os"
 
 	"github.com/fluxynet/goqa"
-	"github.com/fluxynet/goqa/repo"
 )
 
 const (
 	filename = "goqa.repo.json"
 )
 
-func init() {
-	var _ goqa.Repo = New()
-}
+type filewriterFunc func(name string, data []byte, perm os.FileMode) error
+type filereaderFunc func(name string) ([]byte, error)
+
+var (
+	filewriter filewriterFunc = os.WriteFile
+	filereader filereaderFunc = os.ReadFile
+)
 
 type Flat struct{}
 
@@ -24,39 +27,26 @@ func New() *Flat {
 }
 
 func (f Flat) Save(ctx context.Context, covs ...goqa.Coverage) error {
-	var b, err = json.Marshal(covs)
+	var (
+		b   []byte
+		err error
+	)
+
+	if len(covs) == 0 {
+		b = []byte("[]")
+	} else {
+		b, err = json.Marshal(covs)
+	}
+
 	if err != nil {
 		return err
 	}
 
-	var cwd string
-	cwd, err = os.Getwd()
-	if err != nil {
-		return nil
-	}
-
-	var h *os.File
-	h, err = os.CreateTemp(cwd, filename+".tmp")
-	if err != nil {
-		return err
-	}
-
-	var t int
-	t, err = h.Write(b)
-
-	if err != nil {
-		return err
-	} else if t != len(b) {
-		return repo.ErrFailedToWriteCompletely
-	}
-
-	os.Rename(h.Name(), filename)
-
-	return nil
+	return filewriter(filename, b, 0644)
 }
 
 func (f Flat) Load(ctx context.Context) ([]goqa.Coverage, error) {
-	var b, err = os.ReadFile(filename)
+	var b, err = filereader(filename)
 
 	if os.IsNotExist(err) {
 		return nil, nil

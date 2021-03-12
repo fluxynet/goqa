@@ -53,7 +53,7 @@ func main() {
 		log.Fatalln("failed to load coverage from file", err.Error())
 	}
 
-	err = cache.Reinit(covs...)
+	err = cache.Reset(covs...)
 	if err != nil {
 		log.Fatalln("failed to initialize cache", err.Error())
 	}

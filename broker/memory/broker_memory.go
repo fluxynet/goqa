@@ -7,13 +7,9 @@ import (
 	"github.com/fluxynet/goqa"
 )
 
-func init() {
-	var _ goqa.Broker = New()
-}
-
 type Memory struct {
 	listeners []chan goqa.Event
-	mutex     sync.RWMutex
+	mutex     sync.Mutex
 }
 
 func New() *Memory {
@@ -24,17 +20,15 @@ func (m *Memory) Listen(ctx context.Context) (<-chan goqa.Event, error) {
 	var c = make(chan goqa.Event)
 
 	defer m.mutex.Unlock()
-
-	m.listeners = append(m.listeners, c)
-
 	m.mutex.Lock()
+	m.listeners = append(m.listeners, c)
 
 	return c, nil
 }
 
 func (m *Memory) Publish(ctx context.Context, event goqa.Event) error {
-	defer m.mutex.RUnlock()
-	m.mutex.RLock()
+	defer m.mutex.Unlock()
+	m.mutex.Lock()
 
 	var wg sync.WaitGroup
 	wg.Add(len(m.listeners))
@@ -46,12 +40,18 @@ func (m *Memory) Publish(ctx context.Context, event goqa.Event) error {
 		}(m.listeners[i])
 	}
 
+	wg.Wait()
+
 	return nil
 }
 
 func (m *Memory) Close() error {
-	defer m.mutex.RUnlock()
-	m.mutex.RLock()
+	if m.listeners == nil {
+		return nil
+	}
+
+	defer m.mutex.Unlock()
+	m.mutex.Lock()
 
 	var wg sync.WaitGroup
 	wg.Add(len(m.listeners))
@@ -62,6 +62,8 @@ func (m *Memory) Close() error {
 			close(l)
 		}(m.listeners[i])
 	}
+
+	wg.Wait()
 
 	m.listeners = nil
 
