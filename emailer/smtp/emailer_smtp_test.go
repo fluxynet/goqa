@@ -66,7 +66,9 @@ func SendMailError(addr string, a smtp.Auth, from string, to []string, msg []byt
 }
 
 func TestNew(t *testing.T) {
-	var _ goqa.Emailer = New("", "", "", "")
+	t.Run("New", func(t *testing.T) {
+		var _ goqa.Emailer = New("", "", "", "")
+	})
 }
 
 func TestSmtp_Send(t *testing.T) {

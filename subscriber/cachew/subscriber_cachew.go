@@ -5,10 +5,6 @@ import (
 	"github.com/fluxynet/goqa/subscriber"
 )
 
-func init() {
-	var _ goqa.Subscriber = New(nil)
-}
-
 func New(c goqa.Cache) *Cache {
 	return &Cache{cache: c}
 }

@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/fluxynet/goqa"
 	"github.com/fluxynet/goqa/roster"
@@ -11,6 +12,7 @@ import (
 )
 
 type Server struct {
+	Prefix    string
 	Cache     goqa.Cache
 	Broker    goqa.Broker
 	Roster    goqa.Roster
@@ -23,6 +25,8 @@ func (s *Server) List(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		web.JsonError(w, http.StatusInternalServerError, err)
 		return
+	} else if keys == nil {
+		keys = []string{}
 	}
 
 	web.Json(w, keys)
@@ -30,7 +34,7 @@ func (s *Server) List(w http.ResponseWriter, r *http.Request) {
 
 // Get endpoint for single coverage api endpoint
 func (s *Server) Get(w http.ResponseWriter, r *http.Request) {
-	var pkg string
+	var pkg = strings.TrimPrefix(r.URL.Path, s.Prefix)
 
 	var cov, ok = s.Cache.Get(pkg)
 

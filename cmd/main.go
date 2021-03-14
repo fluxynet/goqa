@@ -32,9 +32,8 @@ func main() {
 		mailer = smtp.New(cfg.EmailHost, cfg.EmailUsr, cfg.EmailPass, cfg.EmailFrom)
 
 		hookServer = hook.Hook{
-			Broker:    broker,
-			Signature: cfg.GithubSignature,
-			Token:     cfg.GithubToken,
+			Broker: broker,
+			SigKey: cfg.GithubSigKey,
 		}
 
 		webServer = server.Server{

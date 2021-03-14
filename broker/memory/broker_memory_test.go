@@ -247,5 +247,7 @@ func TestMemory_Publish(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	var _ goqa.Broker = New()
+	t.Run("New", func(t *testing.T) {
+		var _ goqa.Broker = New()
+	})
 }

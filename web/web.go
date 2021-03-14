@@ -1,6 +1,9 @@
 package web
 
 import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"io"
@@ -37,7 +40,10 @@ var (
 
 // Send data to the browser
 func Print(w http.ResponseWriter, status int, ctype string, content []byte) {
-	w.Header().Set("Content-Type", ctype)
+	if ctype != "" {
+		w.Header().Set("Content-Type", ctype)
+	}
+
 	w.WriteHeader(status)
 	w.Write(content)
 }
@@ -54,14 +60,40 @@ func Json(w http.ResponseWriter, r interface{}) {
 
 // JsonError to the browser in json format
 func JsonError(w http.ResponseWriter, status int, err error) {
-	var m = strings.ReplaceAll(err.Error(), `"`, `\"`)
+	var m string
+
+	if err != nil {
+		m = strings.ReplaceAll(err.Error(), `"`, `\"`)
+	}
+
 	Print(w, status, ContentTypeJSON, []byte(`{"error":"`+m+`"}`))
 }
 
 // VerifyBody payload
-func VerifyBody(hash string, b []byte, sig, token string) error {
-	// todo
-	return nil // ErrPayloadUnverified
+func VerifyBody(b []byte, sig, key string) error {
+	if len(sig) != 45 || !strings.HasPrefix(sig, "sha1=") {
+		return ErrPayloadUnverified
+	}
+
+	var (
+		got    = make([]byte, 20)
+		_, err = hex.Decode(got, []byte(sig[5:]))
+	)
+
+	if err != nil {
+		return ErrPayloadUnverified
+	}
+
+	var h = hmac.New(sha1.New, []byte(key))
+	h.Write(b)
+
+	var want = h.Sum(nil)
+
+	if !hmac.Equal(got, want) {
+		return ErrPayloadUnverified
+	}
+
+	return nil
 }
 
 // ReadBody from an http.Request

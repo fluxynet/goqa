@@ -18,8 +18,7 @@ type Config struct {
 	EmailPass        string   `json:"email_pass"`
 	EmailFrom        string   `json:"email_from"`
 	EmailSubscribers []string `json:"email_subscribers"`
-	GithubSignature  string   `json:"github_signature"`
-	GithubToken      string   `json:"github_token"`
+	GithubSigKey     string   `json:"github_sigkey"`
 }
 
 // LoadConf from a file named config.json placed in the same directory; bleh

@@ -5,12 +5,14 @@ import (
 	"log"
 )
 
-// Attach a roster to a broker
+// Attach a roster to a broker; stops if the context stops
 func Attach(ctx context.Context, b Broker, r Roster) {
 	var c, err = b.Listen(context.Background())
 	if err != nil {
 		return
 	}
+
+	defer Closed(b)
 
 	for {
 		select {

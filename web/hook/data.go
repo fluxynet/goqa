@@ -25,7 +25,6 @@ type Datum struct {
 	Package string `json:"Package"`
 	Test    string `json:"Test"`
 	Output  string `json:"Output"`
-	Elapsed string `json:"Elapsed"`
 }
 
 // CreateGithubEvent get coverage information from a Payload

@@ -2,29 +2,38 @@ package hook
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/fluxynet/goqa"
 	"github.com/fluxynet/goqa/web"
 )
 
+const githubHeaderSignature = "X-Hub-Signature"
+
+var (
+	errIncompleteRequest = errors.New("request incomplete")
+)
+
 type Hook struct {
-	Broker    goqa.Broker
-	Signature string
-	Token     string
+	Broker goqa.Broker
+	// SigKey used in hash
+	SigKey string
 }
 
 // Receive a web hook
 func (h *Hook) Receive(w http.ResponseWriter, r *http.Request) {
-	var body, err = web.ReadBody(r)
+	var (
+		body, err = web.ReadBody(r)
+		signature = r.Header.Get(githubHeaderSignature)
+	)
 
-	if err != nil {
-		web.JsonError(w, http.StatusBadRequest, err)
+	if err != nil || len(body) == 0 || signature == "" {
+		web.JsonError(w, http.StatusBadRequest, errIncompleteRequest)
 		return
 	}
 
-	var hash string
-	if err = web.VerifyBody(hash, body, h.Signature, h.Token); err != nil {
+	if err = web.VerifyBody(body, signature, h.SigKey); err != nil {
 		web.JsonError(w, http.StatusBadRequest, err)
 		return
 	}
@@ -32,12 +41,12 @@ func (h *Hook) Receive(w http.ResponseWriter, r *http.Request) {
 	var payload *Payload
 	err = json.Unmarshal(body, &payload)
 	if err != nil {
-		web.JsonError(w, http.StatusBadRequest, err)
+		web.JsonError(w, http.StatusBadRequest, errIncompleteRequest)
 		return
 	}
 
 	var event = CreateGithubEvent(payload)
-	if event == nil {
+	if len(event.Coverage) == 0 {
 		web.Json(w, web.Response{Message: "web hook was not very interesting"})
 		return
 	}

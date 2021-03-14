@@ -285,7 +285,9 @@ func TestMemory_Keys(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	var _ goqa.Cache = New()
+	t.Run("New", func(t *testing.T) {
+		var _ goqa.Cache = New()
+	})
 }
 
 func TestMemory_Reset(t *testing.T) {

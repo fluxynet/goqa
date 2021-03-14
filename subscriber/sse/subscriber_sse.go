@@ -36,7 +36,9 @@ func (s *SSE) Notify(event goqa.Event) error {
 		data = strings.ReplaceAll(event.String(), "\n", "_")
 	)
 
-	fmt.Fprintf(s.writer, "event: %s\n", ev)
+	if ev != "" {
+		fmt.Fprintf(s.writer, "event: %s\n", ev)
+	}
 	fmt.Fprintf(s.writer, "data: %s\n\n", strings.ReplaceAll(data, "\n", "\ndata: "))
 
 	s.flusher.Flush()

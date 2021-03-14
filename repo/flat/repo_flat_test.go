@@ -160,7 +160,9 @@ func makeCoverages(t, skip int) []goqa.Coverage {
 }
 
 func TestNew(t *testing.T) {
-	var _ goqa.Repo = New()
+	t.Run("New", func(t *testing.T) {
+		var _ goqa.Repo = New()
+	})
 }
 
 func TestFlat_Close(t *testing.T) {
