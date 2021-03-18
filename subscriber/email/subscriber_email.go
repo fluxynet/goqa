@@ -17,7 +17,7 @@ func New(mailer goqa.Emailer, email string) *Email {
 }
 
 type Email struct {
-	goqa.Identifiable
+	subscriber.Identifiable
 	mailer goqa.Emailer
 	Email  string
 }

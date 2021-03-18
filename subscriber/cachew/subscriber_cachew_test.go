@@ -19,12 +19,10 @@ func (f *fakecache) Reset(covs ...goqa.Coverage) error {
 
 func (f *fakecache) Get(pkg string) (*goqa.Coverage, bool) {
 	panic("not implemented")
-	return nil, false
 }
 
 func (f *fakecache) Keys() ([]string, error) {
 	panic("not implemented")
-	return nil, nil
 }
 
 func (f *fakecache) Close() error {

@@ -75,5 +75,5 @@ func (s *Server) SSE(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go roster.WatchCtx(ctx, s.Roster, sub)
+	roster.WatchCtx(ctx, s.Roster, sub)
 }

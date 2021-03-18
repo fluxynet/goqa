@@ -13,7 +13,9 @@ import (
 	"github.com/fluxynet/goqa/repo/flat"
 	rosters "github.com/fluxynet/goqa/roster/memory"
 	"github.com/fluxynet/goqa/subscriber/cachew"
+	"github.com/fluxynet/goqa/subscriber/coverage"
 	"github.com/fluxynet/goqa/subscriber/email"
+	repos "github.com/fluxynet/goqa/subscriber/repo"
 	"github.com/fluxynet/goqa/web/hook"
 	"github.com/fluxynet/goqa/web/server"
 )
@@ -29,7 +31,7 @@ func main() {
 		broker = brokers.New()
 		cache  = caches.New()
 		roster = rosters.New()
-		mailer = smtp.New(cfg.EmailHost, cfg.EmailUsr, cfg.EmailPass, cfg.EmailFrom)
+		mailer = smtp.New(cfg.EmailHost, cfg.EmailPort, cfg.EmailUsr, cfg.EmailPass, cfg.EmailFrom)
 
 		hookServer = hook.Hook{
 			Broker: broker,
@@ -41,42 +43,80 @@ func main() {
 			Cache:     cache,
 			Roster:    roster,
 			IndexHTML: goqa.AssetIndexHtml,
+			Prefix:    "/api/",
 		}
 	)
 
-	var ctx = context.Background()
+	var app = App{
+		cfg:        cfg,
+		roster:     roster,
+		cache:      cache,
+		mailer:     mailer,
+		broker:     broker,
+		repo:       repo,
+		hookServer: &hookServer,
+		webServer:  &webServer,
+	}
+
+	app.Serve(context.Background())
+}
+
+type App struct {
+	cfg        *Config
+	roster     goqa.Roster
+	cache      goqa.Cache
+	mailer     goqa.Emailer
+	broker     goqa.Broker
+	hookServer *hook.Hook
+	repo       goqa.Repo
+	webServer  *server.Server
+}
+
+func (a *App) Serve(ctx context.Context) {
+	var err error
 
 	var covs []goqa.Coverage
-	covs, err = repo.Load(ctx)
+	covs, err = a.repo.Load(ctx)
 	if err != nil {
 		log.Fatalln("failed to load coverage from file", err.Error())
 	}
 
-	err = cache.Reset(covs...)
+	err = a.roster.Subscribe(ctx, goqa.EventGithub, repos.New(a.repo))
+	if err != nil {
+		log.Fatalln("failed to subscribe repo to "+goqa.EventGithub, err.Error())
+	}
+
+	err = a.cache.Reset(covs...)
 	if err != nil {
 		log.Fatalln("failed to initialize cache", err.Error())
 	}
 
-	err = roster.Subscribe(ctx, goqa.EventGithub, cachew.New(cache))
+	err = a.roster.Subscribe(ctx, goqa.EventGithub, cachew.New(a.cache))
 	if err != nil {
-		log.Fatalln("failed to subscribe to "+goqa.EventGithub, err.Error())
+		log.Fatalln("failed to subscribe cachew to "+goqa.EventGithub, err.Error())
 	}
 
-	for i := range cfg.EmailSubscribers {
-		err = roster.Subscribe(ctx, goqa.EventCoverage, email.New(mailer, cfg.EmailSubscribers[i]))
+	err = a.roster.Subscribe(ctx, goqa.EventGithub, coverage.New(a.broker))
+	if err != nil {
+		log.Fatalln("failed to subscribe coverage to "+goqa.EventGithub, err.Error())
+	}
+
+	for i := range a.cfg.EmailSubscribers {
+		var sub = email.New(a.mailer, a.cfg.EmailSubscribers[i])
+		err = a.roster.Subscribe(ctx, goqa.EventCoverage, sub)
 		if err != nil {
 			log.Fatalln("failed to subscribe to "+goqa.EventCoverage, err.Error())
 		}
 	}
 
-	goqa.Attach(ctx, broker, roster)
+	go goqa.Attach(a.broker, a.roster)
 
-	http.HandleFunc("/github", hookServer.Receive)
-	http.HandleFunc("/api/sse", webServer.SSE)
-	http.HandleFunc("/api/", webServer.Get) // slash is the difference; not best practice
-	http.HandleFunc("/api", webServer.List) // makes life easier :(
-	http.HandleFunc("/", webServer.Index)
+	http.HandleFunc("/github", a.hookServer.Receive)
+	http.HandleFunc("/api/sse", a.webServer.SSE)
+	http.HandleFunc("/api/", a.webServer.Get) // slash is the difference; not best practice
+	http.HandleFunc("/api", a.webServer.List) // makes life easier :(
+	http.HandleFunc("/", a.webServer.Index)
 
-	fmt.Println("Server starting on: http://" + cfg.ServerHost)
-	http.ListenAndServe(cfg.ServerHost, nil)
+	fmt.Println("Server starting on: http://" + a.cfg.ServerHost)
+	http.ListenAndServe(a.cfg.ServerHost, nil)
 }

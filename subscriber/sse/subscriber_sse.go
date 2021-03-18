@@ -20,17 +20,13 @@ func New(writer io.Writer, flusher http.Flusher) *SSE {
 }
 
 type SSE struct {
-	goqa.Identifiable
+	subscriber.Identifiable
 	ctx     context.Context
 	flusher http.Flusher
 	writer  io.Writer
 }
 
 func (s *SSE) Notify(event goqa.Event) error {
-	if s.ctx == nil {
-		return nil
-	}
-
 	var (
 		ev   = strings.ReplaceAll(event.Name(), "\n", "_")
 		data = strings.ReplaceAll(event.String(), "\n", "_")
@@ -41,7 +37,9 @@ func (s *SSE) Notify(event goqa.Event) error {
 	}
 	fmt.Fprintf(s.writer, "data: %s\n\n", strings.ReplaceAll(data, "\n", "\ndata: "))
 
-	s.flusher.Flush()
+	if s.flusher != nil {
+		s.flusher.Flush()
+	}
 
 	return nil
 }

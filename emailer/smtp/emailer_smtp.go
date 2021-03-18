@@ -11,9 +11,10 @@ var (
 	sendmail sendmailFunc = smtp.SendMail
 )
 
-func New(host, usr, pass, from string) Smtp {
+func New(host, port, usr, pass, from string) Smtp {
 	return Smtp{
 		host: host,
+		port: port,
 		usr:  usr,
 		pass: pass,
 		from: from,
@@ -22,6 +23,7 @@ func New(host, usr, pass, from string) Smtp {
 
 type Smtp struct {
 	host string
+	port string
 	usr  string
 	pass string
 	from string
@@ -47,7 +49,7 @@ func (s Smtp) Send(subject string, message string, recipients ...string) error {
 	// todo make this parallel maybe?
 	for i := range recipients {
 		var msg = append([]byte("To: "+recipients[i]+"\r\n"), body...)
-		err = sendmail(s.host, auth, s.from, []string{recipients[i]}, msg)
+		err = sendmail(s.host+":"+s.port, auth, s.from, []string{recipients[i]}, msg)
 
 		if err != nil {
 			return err

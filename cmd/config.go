@@ -14,6 +14,7 @@ const (
 type Config struct {
 	ServerHost       string   `json:"server_host"`
 	EmailHost        string   `json:"email_host"`
+	EmailPort        string   `json:"email_port"`
 	EmailUsr         string   `json:"email_usr"`
 	EmailPass        string   `json:"email_pass"`
 	EmailFrom        string   `json:"email_from"`

@@ -8,6 +8,6 @@ import (
 
 // WatchCtx a context and unsubscribe when done
 func WatchCtx(ctx context.Context, roster goqa.Roster, sub goqa.Subscriber) {
+	defer roster.Unsubscribe(context.Background(), sub.ID())
 	<-ctx.Done()
-	roster.Unsubscribe(context.Background(), sub.ID())
 }

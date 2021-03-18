@@ -29,12 +29,10 @@ func (f *fakesubscriber) Notify(event Event) error {
 
 func (f *fakesubscriber) Serialize() (string, error) {
 	panic("not implemented")
-	return "", nil
 }
 
 func (f *fakesubscriber) Unserialize(s string) error {
 	panic("not implemented")
-	return nil
 }
 
 type fakeevent struct {

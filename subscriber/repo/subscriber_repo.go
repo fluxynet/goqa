@@ -17,9 +17,15 @@ type Repo struct {
 }
 
 func (r Repo) Notify(event goqa.Event) error {
-	var e, ok = event.(goqa.GithubEvent)
-	if !ok {
+	var e *goqa.GithubEvent
+
+	switch v := event.(type) {
+	default:
 		return subscriber.ErrUnsupportedEvent
+	case *goqa.GithubEvent:
+		e = v
+	case goqa.GithubEvent:
+		e = &v
 	}
 
 	return r.repo.Save(context.Background(), e.Coverage...)

@@ -16,9 +16,15 @@ type Cache struct {
 }
 
 func (c *Cache) Notify(event goqa.Event) error {
-	var e, ok = event.(goqa.GithubEvent)
-	if !ok {
+	var e *goqa.GithubEvent
+
+	switch v := event.(type) {
+	default:
 		return subscriber.ErrUnsupportedEvent
+	case *goqa.GithubEvent:
+		e = v
+	case goqa.GithubEvent:
+		e = &v
 	}
 
 	var err = c.cache.Reset(e.Coverage...)

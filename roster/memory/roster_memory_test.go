@@ -30,17 +30,14 @@ func (f *fakesubscriber) SetID(id string) {
 
 func (f *fakesubscriber) Notify(event goqa.Event) error {
 	panic("not supported")
-	return nil
 }
 
 func (f *fakesubscriber) Serialize() (string, error) {
 	panic("not supported")
-	return "", nil
 }
 
 func (f *fakesubscriber) Unserialize(s string) error {
 	panic("not supported")
-	return nil
 }
 
 func TestNew(t *testing.T) {

@@ -18,7 +18,6 @@ type fakecache struct {
 
 func (f fakecache) Reset(covs ...goqa.Coverage) error {
 	panic("not implemented")
-	return nil
 }
 
 func (f fakecache) Get(pkg string) (*goqa.Coverage, bool) {

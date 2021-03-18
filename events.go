@@ -18,7 +18,7 @@ type GithubEvent struct {
 
 // Name of the event
 func (e GithubEvent) Name() string {
-	return EventCoverage
+	return EventGithub
 }
 
 // String representation of the event
@@ -49,5 +49,5 @@ func (c CoverageEvent) Name() string {
 }
 
 func (c CoverageEvent) String() string {
-	return fmt.Sprintf("pkg: %s; percentage: %s; time: %s", c.Pkg, c.Pkg, c.Time)
+	return fmt.Sprintf("pkg: %s; percentage: %d %%; time: %s", c.Pkg, c.Percentage, c.Time)
 }

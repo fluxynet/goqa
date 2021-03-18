@@ -6,7 +6,7 @@ import (
 )
 
 // Attach a roster to a broker; stops if the context stops
-func Attach(ctx context.Context, b Broker, r Roster) {
+func Attach(b Broker, r Roster) {
 	var c, err = b.Listen(context.Background())
 	if err != nil {
 		return
@@ -14,17 +14,12 @@ func Attach(ctx context.Context, b Broker, r Roster) {
 
 	defer Closed(b)
 
-	for {
-		select {
-		case event := <-c:
-			var subs, err = r.Subscribers(context.Background(), event.Name())
-			if err == nil {
-				go Publish(event, subs...)
-			} else {
-				log.Printf("failed to get subscribers\n%s\n%s\n", err.Error(), event.Name())
-			}
-		case <-ctx.Done():
-			return
+	for event := range c {
+		var subs, err = r.Subscribers(context.Background(), event.Name())
+		if err == nil {
+			go Publish(event, subs...)
+		} else {
+			log.Printf("failed to get subscribers\n%s\n%s\n", err.Error(), event.Name())
 		}
 	}
 }
