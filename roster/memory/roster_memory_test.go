@@ -32,14 +32,6 @@ func (f *fakesubscriber) Notify(event goqa.Event) error {
 	panic("not supported")
 }
 
-func (f *fakesubscriber) Serialize() (string, error) {
-	panic("not supported")
-}
-
-func (f *fakesubscriber) Unserialize(s string) error {
-	panic("not supported")
-}
-
 func TestNew(t *testing.T) {
 	t.Run("New", func(t *testing.T) {
 		var _ goqa.Roster = New()

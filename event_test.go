@@ -27,14 +27,6 @@ func (f *fakesubscriber) Notify(event Event) error {
 	return nil
 }
 
-func (f *fakesubscriber) Serialize() (string, error) {
-	panic("not implemented")
-}
-
-func (f *fakesubscriber) Unserialize(s string) error {
-	panic("not implemented")
-}
-
 type fakeevent struct {
 	name string
 }

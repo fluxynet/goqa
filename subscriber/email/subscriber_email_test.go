@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/fluxynet/goqa"
-	"github.com/fluxynet/goqa/subscriber"
 )
 
 type fakemailer struct {
@@ -133,94 +132,6 @@ func TestEmail_Notify(t *testing.T) {
 				if m.recipients[i] != tt.want.recipients[i] {
 					t.Errorf("recipients(%d):\nwant = %s\ngot  = %s", i, tt.want.recipients[i], m.recipients[i])
 				}
-			}
-		})
-	}
-}
-
-func TestEmail_Serialize(t *testing.T) {
-	type fields struct {
-		Email string
-	}
-
-	tests := []struct {
-		name    string
-		fields  fields
-		want    string
-		wantErr error
-	}{
-		{
-			name:    "empty email",
-			fields:  fields{},
-			want:    "",
-			wantErr: subscriber.ErrSerializeNotSupported,
-		},
-		{
-			name: "non-empty email",
-			fields: fields{
-				Email: "john@doe.com",
-			},
-			want:    "john@doe.com",
-			wantErr: nil,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			e := Email{
-				Email: tt.fields.Email,
-			}
-
-			got, err := e.Serialize()
-			if err != tt.wantErr {
-				t.Errorf("err\nwant = %v\ngot  = %v", tt.wantErr, err)
-				return
-			}
-
-			if got != tt.want {
-				t.Errorf("Serialize() got = %s, want %s", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestEmail_Unserialize(t *testing.T) {
-	type args struct {
-		s string
-	}
-
-	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr error
-	}{
-		{
-			name:    "empty",
-			wantErr: subscriber.ErrSerializeNotSupported,
-		},
-		{
-			name: "non-empty",
-			args: args{
-				s: "foo@bar.com",
-			},
-			want: "foo@bar.com",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			e := &Email{}
-
-			err := e.Unserialize(tt.args.s)
-
-			if err != tt.wantErr {
-				t.Errorf("err\nwant = %v\ngot  = %v", tt.wantErr, err)
-				return
-			}
-
-			if e.Email != tt.want {
-				t.Errorf("Serialize() got = %s, want %s", e.Email, tt.want)
 			}
 		})
 	}

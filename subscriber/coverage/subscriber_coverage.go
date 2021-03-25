@@ -45,11 +45,3 @@ func (c Coverage) Notify(event goqa.Event) error {
 
 	return nil
 }
-
-func (c Coverage) Serialize() (string, error) {
-	return "", subscriber.ErrSerializeNotSupported
-}
-
-func (c Coverage) Unserialize(s string) error {
-	return subscriber.ErrSerializeNotSupported
-}

@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/fluxynet/goqa"
-	"github.com/fluxynet/goqa/subscriber"
 )
 
 func TestNew(t *testing.T) {
@@ -102,30 +101,4 @@ func TestSSE_Notify(t *testing.T) {
 
 		})
 	}
-}
-
-func TestSSE_Serialize(t *testing.T) {
-	t.Run("serialize", func(t *testing.T) {
-		s := &SSE{}
-		got, err := s.Serialize()
-		if err != subscriber.ErrSerializeNotSupported {
-			t.Errorf("Serialize() error = %v, wantErr %v", err, subscriber.ErrSerializeNotSupported)
-			return
-		}
-
-		if got != "" {
-			t.Errorf("Serialize() got = %v, want %v", got, "")
-		}
-	})
-}
-
-func TestSSE_Unserialize(t *testing.T) {
-	t.Run("unserialize", func(t *testing.T) {
-		s := &SSE{}
-		err := s.Unserialize("")
-		if err != subscriber.ErrSerializeNotSupported {
-			t.Errorf("Serialize() error = %v, wantErr %v", err, subscriber.ErrSerializeNotSupported)
-			return
-		}
-	})
 }

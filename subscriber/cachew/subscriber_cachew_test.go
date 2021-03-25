@@ -281,32 +281,6 @@ func TestCache_Notify(t *testing.T) {
 	}
 }
 
-func TestCache_Serialize(t *testing.T) {
-	t.Run("serialize", func(t *testing.T) {
-		c := &Cache{}
-		got, err := c.Serialize()
-		if err != subscriber.ErrSerializeNotSupported {
-			t.Errorf("Serialize() error = %v, wantErr %v", err, subscriber.ErrSerializeNotSupported)
-			return
-		}
-
-		if got != "" {
-			t.Errorf("Serialize() got = %v, want %v", got, "")
-		}
-	})
-}
-
-func TestCache_Unserialize(t *testing.T) {
-	t.Run("unserialize", func(t *testing.T) {
-		c := &Cache{}
-		err := c.Unserialize("")
-		if err != subscriber.ErrSerializeNotSupported {
-			t.Errorf("Serialize() error = %v, wantErr %v", err, subscriber.ErrSerializeNotSupported)
-			return
-		}
-	})
-}
-
 func TestNew(t *testing.T) {
 	t.Run("New", func(t *testing.T) {
 		var _ goqa.Subscriber = New(nil)

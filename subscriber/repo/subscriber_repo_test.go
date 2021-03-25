@@ -220,29 +220,3 @@ func TestRepo_Notify(t *testing.T) {
 		})
 	}
 }
-
-func TestRepo_Serialize(t *testing.T) {
-	t.Run("serialize", func(t *testing.T) {
-		r := &Repo{}
-		got, err := r.Serialize()
-		if err != subscriber.ErrSerializeNotSupported {
-			t.Errorf("Serialize() error = %v, wantErr %v", err, subscriber.ErrSerializeNotSupported)
-			return
-		}
-
-		if got != "" {
-			t.Errorf("Serialize() got = %v, want %v", got, "")
-		}
-	})
-}
-
-func TestCache_Unserialize(t *testing.T) {
-	t.Run("unserialize", func(t *testing.T) {
-		r := &Repo{}
-		err := r.Unserialize("")
-		if err != subscriber.ErrSerializeNotSupported {
-			t.Errorf("Serialize() error = %v, wantErr %v", err, subscriber.ErrSerializeNotSupported)
-			return
-		}
-	})
-}

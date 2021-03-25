@@ -30,11 +30,3 @@ func (r Repo) Notify(event goqa.Event) error {
 
 	return r.repo.Save(context.Background(), e.Coverage...)
 }
-
-func (r Repo) Serialize() (string, error) {
-	return "", subscriber.ErrSerializeNotSupported
-}
-
-func (r Repo) Unserialize(string) error {
-	return subscriber.ErrSerializeNotSupported
-}

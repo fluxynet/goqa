@@ -43,11 +43,3 @@ func (s *SSE) Notify(event goqa.Event) error {
 
 	return nil
 }
-
-func (s *SSE) Serialize() (string, error) {
-	return "", subscriber.ErrSerializeNotSupported
-}
-
-func (s *SSE) Unserialize(string) error {
-	return subscriber.ErrSerializeNotSupported
-}

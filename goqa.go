@@ -68,29 +68,16 @@ type Event interface {
 	String() string
 }
 
-// Identifiable has an id
-type Identifiable interface {
+// Subscriber is someone who listens to events
+type Subscriber interface {
 	// ID
 	ID() string
 
 	// SetID
 	SetID(id string)
-}
-
-// Subscriber is someone who listens to events
-type Subscriber interface {
-	Identifiable
 
 	// Notify sends the event to the subscriber
 	Notify(event Event) error
-
-	// Serialize returns data as to how to persist the subscriber's subscription
-	// we have an event system, we could have a Subscription / Unsubscription event
-	// then persist subscribers through serialization / unserialization
-	Serialize() (string, error)
-
-	// Unserialize from persistence
-	Unserialize(s string) error
 }
 
 // Roster keeps track of subscribers

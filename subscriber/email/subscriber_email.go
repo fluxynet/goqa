@@ -29,20 +29,3 @@ func (e Email) Notify(event goqa.Event) error {
 
 	return e.mailer.Send(event.Name(), event.String(), e.Email)
 }
-
-func (e Email) Serialize() (string, error) {
-	if e.Email == "" {
-		return "", subscriber.ErrSerializeNotSupported
-	}
-
-	return e.Email, nil
-}
-
-func (e *Email) Unserialize(s string) error {
-	if s == "" {
-		return subscriber.ErrSerializeNotSupported
-	}
-
-	e.Email = s
-	return nil
-}

@@ -30,11 +30,3 @@ func (c *Cache) Notify(event goqa.Event) error {
 	var err = c.cache.Reset(e.Coverage...)
 	return err
 }
-
-func (c *Cache) Serialize() (string, error) {
-	return "", subscriber.ErrSerializeNotSupported
-}
-
-func (c *Cache) Unserialize(string) error {
-	return subscriber.ErrSerializeNotSupported
-}
